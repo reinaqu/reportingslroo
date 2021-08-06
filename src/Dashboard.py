@@ -3,23 +3,11 @@ Created on 10 jul. 2021
 
 @author: reinaqu_2
 '''
-import pandas as pd
-from csvbib_utils import *
-import dataframes
-import csv
 from dataclasses import dataclass
 from typing import TypeVar
 import Publications as pub
 import graphics_utils as gu
-from bibtexparser.bibdatabase import BibDatabase
-import bibtexparser
-from bibtexparser.bparser import BibTexParser
-import time
-import dois
 import logging
-from fcache.cache import FileCache
-import dblp_utils
-import json_utils
 import Authors as authors
 
 Dashboard = TypeVar('Dashboard')
