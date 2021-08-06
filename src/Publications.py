@@ -130,7 +130,7 @@ class Publications:
         datasource_per_search = self.configuration.get('searches_datasources')
         res= self.dataframe[id_search_col]\
                     .astype(int)\
-                    .transform(datasource_per_search.get)\
+                    .apply(datasource_per_search.get)\
                     .value_counts() 
         return res      
     
