@@ -96,12 +96,14 @@ class Publications:
                    .rename_axis('type') 
 
     @property
-    def studies_by_year(self)->pd.DataFrame:
+    def count_studies_by_year(self)->pd.DataFrame:
         preconditions.checkArgument('year' in self.configuration,"Should specify the name of the column for year")
         year_col = self.get_year_colname
         df_studies_by_year= self.dataframe[year_col]\
                                 .astype(int)\
-                                .value_counts()
+                                .value_counts()\
+                                .rename('number of studies',inplace=True)\
+                                .rename_axis('year') 
         ## As there may be yaars without studies, we must fill the years with zeros
         dataframes.fill_gaps_with_zeros(df_studies_by_year)
        
