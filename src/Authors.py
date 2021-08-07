@@ -16,7 +16,7 @@ Authors = TypeVar('Authors')
 class Authors:
     """
 
-        This class stores all the info about Papers and different Publications written in a CSV or a xlsx.
+        This class stores all the info about Authors and different written in a CSV or a xlsx.
 
         About the atributes, we have 2:
             1. Dataframe: stores the Dataframe of the csv
