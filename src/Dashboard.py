@@ -53,7 +53,7 @@ class Dashboard:
         gu.create_piechart(df,'number of studies',y_axis_label=False)
     @property
     def create_plot_studies_by_year(self)->None:
-        df =self.publications.studies_by_year
+        df =self.publications.count_studies_by_year
     #    gu.create_line_plot_multiple_colums(df, 'year', col_names, colours, markers)
         gu.create_lineplot_from_dataframe(df, 'Year', 'Number of studies')
         
