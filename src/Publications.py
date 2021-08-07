@@ -91,7 +91,9 @@ class Publications:
                    .dropna()\
                    .astype(str)\
                    .transform(commons.normalize)\
-                   .value_counts()
+                   .value_counts()\
+                   .rename('number of studies',inplace=True)\
+                   .rename_axis('type') 
 
     @property
     def studies_by_year(self)->pd.DataFrame:
@@ -131,7 +133,9 @@ class Publications:
         res= self.dataframe[id_search_col]\
                     .astype(int)\
                     .apply(datasource_per_search.get)\
-                    .value_counts() 
+                    .value_counts()\
+                    .rename('number of studies',inplace=True)\
+                    .rename_axis('datasource') 
         return res      
     
     @property
