@@ -9,6 +9,7 @@ import Publications as pub
 import graphics_utils as gu
 import logging
 import Authors as authors
+import preconditions
 
 Dashboard = TypeVar('Dashboard')
 
@@ -18,7 +19,7 @@ https://fcache.readthedocs.io/en/stable/
 
 '''
 
-MAP_FILE='../data/countries.geojson'
+
 
 @dataclass(order=True)
 class Dashboard:
@@ -35,18 +36,21 @@ class Dashboard:
     '''
     publications: pub.Publications
     authors:authors.Authors
+    geojson_file:str
     
     @staticmethod   
     def of(publications:pub.Publications) -> Dashboard:
         logging.basicConfig(level=logging.INFO)
-        return Dashboard(publications, None)
+        return Dashboard(publications, None, None)
     @property  
     def get_publications(self) -> pub.Publications:
         return self.publications
     
     def set_authors(self, authors:authors.Authors)->None:
         self.authors = authors
-        
+
+    def set_geojson_file(self, geojson_file:str)->None:
+        self.geojson_file = geojson_file
     @property
     def create_piechart_studies_by_type(self)->None:
         df =self.publications.count_studies_by_type
@@ -64,6 +68,7 @@ class Dashboard:
         
     @property
     def create_map_countries(self)->None:
+        preconditions.checkState(self.geojson_file!=None, "The file with the coordinates of countries should be set")
         df = self.authors.count_number_of_studies_per_country
-        gu.create_choropleth_map(df,'number of studies', MAP_FILE)
+        gu.create_choropleth_map(df,'number of studies', self.geojson_file)
         
