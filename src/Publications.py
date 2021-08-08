@@ -72,7 +72,7 @@ class Publications:
         for i in range(1,len(sheets)):
             dataframe2 = pd.read_excel(citation_file, sheet_name=sheets[i], usecols=[0,6])
             dataframe2.rename(columns={"Citations":"Citations-"+sheets[i]}, inplace=True)
-            dataframe= pd.merge(dataframe, dataframe2, on='ID-Start')
+            dataframe= pd.merge(dataframe, dataframe2, on='ID Paper')
             order_list.append("Citations-"+sheets[i])
         order_list.append('Title')
         ascending_list =[False]*len(sheets)
