@@ -94,8 +94,7 @@ class Authors:
         id_start = self.configuration.get('id_start')
         country_col = self.configuration.get('country')  
         #create the dataframe with the number of studies per country
-        df_column = self.dataframe[[id_start, country_col]]   
-        print(df_column)  
+        df_column = self.dataframe[[id_start, country_col]]    
         dict_countries = dataframes.create_dict_from_multivalued_column(df_column)
         dict_count = {id:len(ss) for id, ss in dict_countries.items()}
         count_sorted =sorted(dict_count.items(), key=lambda t:t[1], reverse=True)
