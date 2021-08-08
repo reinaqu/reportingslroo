@@ -47,10 +47,14 @@ class DashboardDataExtraction:
 
         
     
-    def create_piechart_count_multivalued_column(self, column_name:str, exclude:List[E]=[])->None:    
-        serie_count = self.data.count_multivalued_column(column_name)
-        serie_count = dataframes.exclude_index_values_from_series(serie_count, exclude)
-        gu.create_piechart(serie_count, column_name, y_axis_label=False, font_size=14, label_distance=1.1, pct_distance=0.9)
+    def create_piechart_count_multivalued_column(self, column_name:str, translation:Dict[K,V]={}, exclude:List[E]=[])->None:    
+        count_serie = self.data.count_multivalued_column(column_name)
+        count_serie =  dataframes.exclude_index_values_from_series(count_serie, exclude)
+            
+        if len(translation) > 0:
+            count_serie = dataframes.translate_index_dataframe (count_serie,translation)
+            
+        gu.create_piechart(count_serie, 'number of studies', y_axis_label=False, font_size=14, label_distance=1.1, pct_distance=0.9)
     
     def create_bar_count_multivalued_column(self, column_name:str, rotation:int=90, translation:Dict[K,V]={}, exclude:List[K]=[])->None:    
         count_serie = self.data.count_multivalued_column(column_name)

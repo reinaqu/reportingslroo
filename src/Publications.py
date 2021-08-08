@@ -64,7 +64,31 @@ class Publications:
         dataframe = pd.read_excel(url, sheet_name=sheetname, skiprows=skip_rows,usecols=use_cols)
         return Publications(dataframe, config, None)
     
-
+    @property
+    def get_id_study_colname(self):
+            return self.configuration.get('id_start')
+    @property
+    def get_title_colname(self):
+        return self.configuration.get('title')
+    @property
+    def get_publication_type_colname(self):    
+        return self.configuration.get('publication-type')
+    @property
+    def get_authors_colname(self):
+        return self.configuration.get('authors')       
+    @property
+    def get_venue_colname(self):
+        return self.configuration.get('venue')
+    @property
+    def get_year_colname(self):
+        return self.configuration.get('year')
+    @property
+    def get_doi_colname(self):
+        return self.configuration.get('doi')
+    @property
+    def get_citations_dataframe(self)->pd.DataFrame:
+        return self.citation_df   
+    
     def set_citations_dataframe_from_excel (self, citation_file:str, sheets:List[str])->None:
         dataframe = pd.read_excel(citation_file, sheet_name=sheets[0], usecols=[0,1,6])
         dataframe.rename(columns={"Citations":"Citations-"+sheets[0]}, inplace=True)
@@ -77,7 +101,7 @@ class Publications:
         order_list.append('Title')
         ascending_list =[False]*len(sheets)
         ascending_list.append(True)
-        print (order_list, ascending_list)    
+        ###Generate the dataframe  
         dataframe = dataframe\
                     .sort_values(order_list, ascending=ascending_list)\
                     .reset_index(drop=True)
@@ -163,27 +187,7 @@ class Publications:
                    .sort_values(order_list)\
                    .reset_index(drop=True)             
                     
-    @property
-    def get_id_study_colname(self):
-            return self.configuration.get('id_start')
-    @property
-    def get_title_colname(self):
-        return self.configuration.get('title')
-    @property
-    def get_publication_type_colname(self):    
-        return self.configuration.get('publication-type')
-    @property
-    def get_authors_colname(self):
-        return self.configuration.get('authors')       
-    @property
-    def get_venue_colname(self):
-        return self.configuration.get('venue')
-    @property
-    def get_year_colname(self):
-        return self.configuration.get('year')
-    @property
-    def get_doi_colname(self):
-        return self.configuration.get('doi')
+
     @property
     def get_keywords_dataframe(self)->pd.DataFrame:
         preconditions.checkState('id_start' in self.configuration,"Should specify the name of the column for id_start")
