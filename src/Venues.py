@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
-from csvbib_utils import *
 import dataframes
-import csv
-import commons
 from dataclasses import dataclass
 from typing import TypeVar
-from json.decoder import NaN
 import preconditions
-import dois
 
 Venues = TypeVar('Venues')
 
