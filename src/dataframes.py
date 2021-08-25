@@ -202,7 +202,16 @@ def create_dataframe_from_multivalued_column (df:pd.DataFrame, column_names:List
     return pd.DataFrame({column_names[0]:list_id, column_names[1]:list_values})   
 
 def create_dataframe_from_faceted_multivalued_column (df:pd.DataFrame, column_names:List[str])->pd.DataFrame:
+    '''
+    @param df: dataframe with the data to be faceted
+    @param column_names: list of strings with exactly 3 elements. The first element of the list is an id, the second one is the name of the column corresponding
+    to the first facet and the third one is the name of the column corresponding to the second facet.
+    @return: a new dataframe
+    @precondition: the list column_names only can have 3 elements
+    @precondition: the dataframe df only can have 3 columns
+    '''
     preconditions.checkArgument(len(column_names)==3, 'The list only must have three column names: the id column_name, the facet 1 column name and the facet 2 column name')
+    preconditions.checkArgument(len(df.columns)==3, 'The dataframe only must have three columns: one with the id, the facet 1 column and the facet 2 column')
     list_id=[]
     list_values_facet1=[]
     list_values_facet2=[]
@@ -220,7 +229,37 @@ def create_dataframe_from_faceted_multivalued_column (df:pd.DataFrame, column_na
             list_values_facet2.append(f2)               
         ##TODO -             
     return pd.DataFrame({column_names[0]:list_id, column_names[1]:list_values_facet1, column_names[2]:list_values_facet2})   
-       
+
+def create_dataframe_from_faceted_multivalued_column_filtered (df:pd.DataFrame, column_names:List[str], include:Set[str])->pd.DataFrame:
+    '''
+    @param df: dataframe with the data to be faceted
+    @param column_names: list of strings with exactly 3 elements. The first element of the list is an id, the second one is the name of the column corresponding
+    to the first facet and the third one is the name of the column corresponding to the second facet.
+    @return: a new dataframe
+    @precondition: the list column_names only can have 3 elements
+    @precondition: the dataframe df only can have 3 columns
+    '''
+    preconditions.checkArgument(len(column_names)==3, 'The list only must have three column names: the id column_name, the facet 1 column name and the facet 2 column name')
+    preconditions.checkArgument(len(df.columns)==3, 'The dataframe only must have three columns: one with the id, the facet 1 column and the facet 2 column')
+    list_id=[]
+    list_values_facet1=[]
+    list_values_facet2=[]
+    for id, facet1, facet2 in df.itertuples(index=False):
+        l_id=[id]
+        l_facet1=[None]
+        if facet1!=None:
+            l_facet1=facet1.split(";")
+        l_facet2=[None]
+        if facet2!=None:
+            l_facet2= facet2.split(";")
+        inter = set(l_facet1).intersection(include)
+        if len(inter)>0:
+            for id, f1, f2 in itertools.product(l_id,inter, l_facet2):
+                list_id.append(id)
+                list_values_facet1.append(f1)
+                list_values_facet2.append(f2)               
+        ##TODO -             
+    return pd.DataFrame({column_names[0]:list_id, column_names[1]:list_values_facet1, column_names[2]:list_values_facet2})      
 def create_dict_from_multivalued_column (df:pd.DataFrame)->Dict[str, Set[str]]:
     '''
     @return A dictionary whose keys are the different values, and the values are

@@ -6,7 +6,7 @@ Created on 10 jul. 2021
 import pandas as pd
 import dataframes
 from dataclasses import dataclass
-from typing import TypeVar,List,Dict
+from typing import TypeVar,List,Dict, Set
 import DataExtraction as datext
 import graphics_utils as gu
 import logging
@@ -63,7 +63,14 @@ class DashboardDataExtraction:
         if len(translation) > 0:
             count_serie = dataframes.translate_index_dataframe (count_serie,translation)
         gu.create_bar(count_serie,x_labels_rotation=rotation)
-     
+  
+    def create_bar_count_faceted_multivalued_column_filtered(self, facet1_name:str, facet2_name:str, include:Set[str], rotation:int=90, translation:Dict[K,V]={}, exclude:List[K]=[])->None:    
+        count_serie = self.data.count_faceted_multivalued_column_filtered(facet1_name, facet2_name, include)
+        count_serie =  dataframes.exclude_index_values_from_series(count_serie, exclude)
+            
+        if len(translation) > 0:
+            count_serie = dataframes.translate_index_dataframe (count_serie,translation)
+        gu.create_bar(count_serie,x_labels_rotation=rotation)   
 
     
     def create_bubble(self, facet1_name:str, facet2_name:str):
