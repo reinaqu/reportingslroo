@@ -116,6 +116,17 @@ def invert_dict (d:Dict[K, List[V]]) -> Dict[V,K]:
             res[v] = k
     return res
 
-    
+def split_multivalued_attribute(attribute:str, separator:str=';')->List[str]:
+    '''
+    @param attribute: The string with the attribute values to be separated
+    @param separator: The character used for separating the different values. By default,
+    the separator is the semicolon
+    @return: A list with the different values of the attribute. If the attribute is
+    none, a List with a None value is returned.
+    '''
+    res=[None]
+    if attribute!=None:
+        res=attribute.split(separator)
+    return res
     
             

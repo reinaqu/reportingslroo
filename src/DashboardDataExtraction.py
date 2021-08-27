@@ -76,3 +76,10 @@ class DashboardDataExtraction:
     def create_bubble(self, facet1_name:str, facet2_name:str):
         df_count = self.data.count_faceted_multivalued_column(facet1_name, facet2_name)
         gu.create_bubble(df_count, 'number of studies', facet1_name, facet2_name)
+    
+    def create_bubble_filled_with_default(self, facet1_name:str, facet2_name:str, include:Set[str],default_facet2_value:str='n/a'):        
+        df_count = self.data.count_faceted_multivalued_column_filled_with_default(facet1_name, facet2_name, include, default_facet2_value)
+        gu.create_bubble(df_count, 'number of studies', facet1_name, facet2_name)
+        
+        
+        
