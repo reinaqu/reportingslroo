@@ -103,6 +103,18 @@ def normalize_punctuation(s:str)->str:
         res =normalize(s).replace(".","").replace(",","").replace(";","")
     return res
 
+def remove_brackets(s:str)->str:
+    '''
+    Takes a str as input and returns a new string without brackets
+    '''
+    res =s
+    if (s!= None):
+        res =s.replace('{','')\
+              .replace('}','')\
+              .replace('(','')\
+              .replace(')','')
+    return res
+
 def invert_dict (d:Dict[K, List[V]]) -> Dict[V,K]:
     '''
     @param d: Dictionary with keys of K type and values lists of element of V type
