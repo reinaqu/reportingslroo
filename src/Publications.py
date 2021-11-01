@@ -33,6 +33,7 @@ class Publications:
     dataframe: pd.DataFrame
     configuration: dict
     citation_df:pd.DataFrame
+    quality_df:pd.DataFrame
 
     @property
     def get_df(self):
@@ -54,7 +55,7 @@ class Publications:
     def of_csv(url: str, config: dict) -> Publications:
         skip_rows= config.get('skip_rows')
         dataframe = pd.read_csv(url, skiprows=skip_rows)
-        return Publications(dataframe, config, None)
+        return Publications(dataframe, config, None, None)
 
     @staticmethod
     def of_excel(url: str, config: dict) -> Publications:
@@ -62,7 +63,7 @@ class Publications:
         skip_rows= config.get('skip_rows')
         sheetname=config.get('sheet_name')
         dataframe = pd.read_excel(url, sheet_name=sheetname, skiprows=skip_rows,usecols=use_cols)
-        return Publications(dataframe, config, None)
+        return Publications(dataframe, config, None, None)
     
     @property
     def get_id_study_colname(self):
@@ -86,8 +87,29 @@ class Publications:
     def get_doi_colname(self):
         return self.configuration.get('doi')
     @property
+    def get_abstract_colname(self):
+        return self.configuration.get('abstract')
+    @property
+    def get_contextual_iq_colname(self):
+        return self.configuration.get('contextual_iq')
+    @property
+    def get_intrinsic_iq_colname(self):
+        return self.configuration.get('intrinsic_iq')
+        
+    @property
     def get_citations_dataframe(self)->pd.DataFrame:
         return self.citation_df   
+    @property
+    def get_quality_dataframe(self)->pd.DataFrame:
+        return self.quality_df
+    
+    @property
+    def get_abstracts(self)->pd.DataFrame:
+        '''
+        @return: A dataframe with the abstracts of the papers
+        '''
+        preconditions.checkArgument('abstract' in self.configuration,"Should specify the name of the column for abstract")
+        return self.dataframe[self.get_abstract_colname]
     
     def set_citations_dataframe_from_excel (self, citation_file:str, sheets:List[str])->None:
         dataframe = pd.read_excel(citation_file, sheet_name=sheets[0], usecols=[0,1,6])
@@ -107,6 +129,17 @@ class Publications:
                     .reset_index(drop=True)
         self.citation_df=dataframe
         
+    def set_quality_dataframe_from_excel (self, quality_publication_file:str):
+        
+        self.quality_df = pd.read_excel(quality_publication_file, \
+                                       sheet_name=self.configuration.get("quality_sheet_name"), \
+                                       skiprows=self.configuration.get('qualtiy_skip_rows'))
+        id = self.get_id_study_colname
+        intrinsic_iq = self.get_intrinsic_iq_colname
+        contextual_iq = self.get_contextual_iq_colname
+        self.quality_df = self.quality_df[[id, intrinsic_iq, contextual_iq]]
+    
+           
     @property
     def count_studies_by_type(self)->pd.DataFrame:
         preconditions.checkArgument('type' in self.configuration,"Should specify the name of the column for type")
@@ -166,6 +199,10 @@ class Publications:
     
     @property
     def get_ordered_studies(self)->pd.DataFrame:
+        '''
+        It returns a dataframe with the columns : id_start, title, publication type, authors, venue, and year. 
+        The datframe is ordered by year, publication type and title.
+        '''
         preconditions.checkArgument('id_start' in self.configuration,"Should specify the name of the column for id_start")
         preconditions.checkArgument('title' in self.configuration,"Should specify the name of the column for title")
         preconditions.checkArgument('year' in self.configuration,"Should specify the name of the column for year")

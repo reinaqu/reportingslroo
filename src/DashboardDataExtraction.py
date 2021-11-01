@@ -8,6 +8,7 @@ import dataframes
 from dataclasses import dataclass
 from typing import TypeVar,List,Dict, Set
 import DataExtraction as datext
+import PublicationsQuality as pubq
 import graphics_utils as gu
 import logging
 
@@ -22,7 +23,7 @@ https://fcache.readthedocs.io/en/stable/
 
 '''
 
-@dataclass(frozen=True, order=True)
+@dataclass( order=True)
 class DashboardDataExtraction:
     '''
 
@@ -36,16 +37,23 @@ class DashboardDataExtraction:
 
     '''
     data: datext.DataExtraction
+    pub_quality: pubq.PublicationsQuality
     
     @staticmethod   
     def of(data:datext.DataExtraction) -> DashboardDataExtraction:
         logging.basicConfig(level=logging.INFO)
-        return DashboardDataExtraction(data)
+        return DashboardDataExtraction(data, None)
+    
     @property  
     def get_data(self) -> datext.DataExtraction:
         return self.data
 
-        
+    @property  
+    def get_publications_quality(self) -> datext.DataExtraction:
+        return self.pub_quality
+
+    def set_publications_quality(self, pub_quality: pubq.PublicationsQuality):
+        self.pub_quality = pub_quality
     
     def create_piechart_count_multivalued_column(self, column_name:str, translation:Dict[K,V]={}, exclude:List[E]=[])->None:    
         count_serie = self.data.count_multivalued_column(column_name)
@@ -81,5 +89,17 @@ class DashboardDataExtraction:
         df_count = self.data.count_faceted_multivalued_column_filled_with_default(facet1_name, facet2_name, include, default_facet2_value)
         gu.create_bubble(df_count, 'number of studies', facet1_name, facet2_name)
         
-        
+    def create_bubble_quality(self):
+        '''
+        It generates a bubble plot with intrinsiq IQ ( X-axis) and contextual IQ (Y-axis)
+        data. 
+        '''
+        df_count = self.get_publications_quality.count_pairs_per_quality_measure
+        intr_iq_colname =self.get_publications_quality.get_intrinsic_iq_colname
+        cont_iq_colname = self.get_publications_quality.get_contextual_iq_colname
+        #As there are pairs of values that are not present in the dataframe,
+        #we need to set up labels
+        labels =['LOW', 'MEDIUM', 'HIGH']
+        gu.create_bubble(df_count, 'number of studies', intr_iq_colname, cont_iq_colname,\
+                          rows=labels, columns=labels)    
         

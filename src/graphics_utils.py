@@ -8,8 +8,10 @@ from matplotlib import pyplot as plt
 import geopandas as gpd
 import dataframes 
 import numpy as np
+import pandas as pd
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import venn
+from typing import List
 
 
 MARKER_SQUARE='s'
@@ -171,14 +173,35 @@ def create_choropleth_map (dataframe, column_name, geojson_mapfile):
     #        plt.annotate(s=str(int(row[column_name])), xy=row['coords'],horizontalalignment='center')
     plt.show()
     
-def create_bubble(dataframe, count_name, x_name, y_name):
+def create_bubble(dataframe:pd.DataFrame, count_name:str, x_name:str, y_name:str, \
+                  rows:List[str]=None, columns:List[str] = None):
+    '''
+    It createa a bubble plot with data from dataframe. The dataframe should
+    contain 3 columns, at least tree columns, one with the count, other with the X-axis
+    values, and another one with the Y-exis values.
+    @param dataframe:  Data frame with the data count. One example of this kind 
+        of dataframe is the folloing one
+                     x_name       y_name          count_name
+            0         HIGH          HIGH                 34
+            1         HIGH        MEDIUM                  5
+            2          LOW          HIGH                 51
+            3          LOW        MEDIUM                 13
+            4       MEDIUM          HIGH                 38
+            5       MEDIUM        MEDIUM                  4
+    @param count_name: Name of the column dataframe that holds the count.
+    @param x_name: Name of the column that holds the labels that will be depicted in X-axis
+    @param y_name: Name of the column that holds the labels that will be depicted in Y-axis
+    @param rows: If None, the labels depicted in X-axis 
+    '''
     #create padding column from values for circles that are neither too small nor too large
     df_aux= dataframe[count_name]
     dataframe["padd"] = 2.5 * (df_aux - df_aux.min()) / (df_aux.max() - df_aux.min()) + 0.5
     fig = plt.figure()
     #prepare the axes for the plot - you can also order your categories at this step
-    rows = [str(row) for row in  dataframe[x_name].to_list()]
-    columns = [str(row) for row in dataframe[y_name].to_list()]
+    if rows == None:
+        rows = [str(row) for row in  dataframe[x_name].to_list()]
+    if columns==None:
+        columns = [str(row) for row in dataframe[y_name].to_list()]
     s = plt.scatter(rows, columns, s = 0)
     #s.remove
     ax = plt.gca()
