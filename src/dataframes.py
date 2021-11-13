@@ -286,6 +286,7 @@ def create_dataframe_from_faceted_multivalued_column_filtered (df:pd.DataFrame, 
                 list_values_facet2.append(f2) 
                       
     return pd.DataFrame({column_names[0]:list_id, column_names[1]:list_values_facet1, column_names[2]:list_values_facet2})      
+
 def create_dict_from_multivalued_column (df:pd.DataFrame)->Dict[str, Set[str]]:
     '''
     @return A dictionary whose keys are the different values, and the values are

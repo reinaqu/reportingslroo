@@ -69,6 +69,12 @@ class DashboardLatex:
             print(ini_text+sources_text+end_text)
                 
     def generate_studies(self):
+        '''
+        It prints on the standard output the list of publications in latex format. An example ot the output for a concrete publicacion is the following one:
+   
+        %S50 id -start: 361084 -------------------------------------------  
+        \textsf{S50}  & \cite{conf/atva/AlbertGLRS18} & Peer-to-peer Affine Commitment Using Bitcoin & K. Crary, M. J. Sullivan  & PLDI'15:479-488, 2015\\
+        '''
         # %S50 id -start: 361084 -------------------------------------------  
         # \textsf{S50}  & \cite{conf/atva/AlbertGLRS18} & Peer-to-peer Affine Commitment Using Bitcoin & K. Crary, M. J. Sullivan  & PLDI'15:479-488, 2015\\     
         df = self.publications.get_ordered_studies
