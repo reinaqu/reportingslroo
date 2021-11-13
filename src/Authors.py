@@ -87,16 +87,23 @@ class Authors:
     
     @property
     def count_number_of_studies_per_country(self)->pd.DataFrame:
+        '''
+        @return: A dataframe with the country names and the number 
+        '''
         #check the configuration has the columns we need
         preconditions.checkState('id_start' in self.configuration,"Should specify the name of the column for id_start")
         preconditions.checkState('country' in self.configuration,"Should specify the name of the column for country")
         #get the column names from the configuration
         id_start = self.configuration.get('id_start')
         country_col = self.configuration.get('country')  
-        #create the dataframe with the number of studies per country
+        #create the dataframe with the id of the study and the country
         df_column = self.dataframe[[id_start, country_col]]    
+        print(df_column)
+        #create a dictionary {country: Set(id_study)}
         dict_countries = dataframes.create_dict_from_multivalued_column(df_column)
+               #create a dictionary {id_study: int} that relates a study and the number of different countries that participate in that study
         dict_count = {id:len(ss) for id, ss in dict_countries.items()}
+        #sort the dictionary by the number of countries descending
         count_sorted =sorted(dict_count.items(), key=lambda t:t[1], reverse=True)
         names, counts = zip(*count_sorted)
         return pd.DataFrame(data={'countries': names,
