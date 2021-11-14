@@ -13,6 +13,7 @@ searches_conf = {'ACM': [0, 6, 7],
                        'Scopus':[4,14,15],
                        'Google Academic': [5,16,17],
                        'Snowballing':[n for n in range(18,185)]}
+
 config_publ ={'skip_rows': 7, 
              'sheet_name':'Papers',
              'use_cols':[0,1,2,3,4,9,10,11,12,13,14,15,16,17,18,19],
@@ -26,7 +27,13 @@ config_publ ={'skip_rows': 7,
              'authors':'Authors',
              'publication-type':'Type',
              'venue':'Journal',
-             'keywords':'Keywords'}
+             'keywords':'Keywords',
+             'abstract': 'Abstract',
+             'quality_sheet_name':'Quality',
+             'quality_skip_rows':0,
+             'contextual_iq': 'Contextual IQ',
+             'intrinsic_iq': 'Intrinsic IQ'
+}
     
 config_auth ={'author_ID':'Author ID',
                   'author_name':'Author name',
