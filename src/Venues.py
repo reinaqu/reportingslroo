@@ -59,6 +59,11 @@ class Venues:
 
     @property
     def count_number_of_studies_per_venue(self)->pd.DataFrame:
+        '''
+        @return: it returns a dataframe with the venues and the number of studies published 
+        in that venue. The dataframe is ordered descending by the number of studies
+        @rtype:pd.DataFrame
+        '''
         preconditions.checkState('venue' in self.configuration,"Should specify the name of the column for venue")
         preconditions.checkState('id_start' in self.configuration,"Should specify the name of the column for id_start")
         preconditions.checkState('type' in self.configuration,"Should specify the name of the column for paper id")
