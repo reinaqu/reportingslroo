@@ -80,7 +80,17 @@ class DashboardDataExtraction:
             count_serie = dataframes.translate_index_dataframe (count_serie,translation)
         gu.create_bar(count_serie,x_labels_rotation=rotation)   
 
-    
+    def create_bar_count_single_column_with_multiple_values(self, column_name:str, rotation:int=90, translation:Dict[K,V]={}, exclude:List[K]=[], count_inferior_limit:int=None)->None:    
+        count_serie = self.data.count_single_column_with_multiple_values(column_name)
+        if count_inferior_limit != None:
+            count_serie = count_serie [count_serie > count_inferior_limit]
+        
+        count_serie =  dataframes.exclude_index_values_from_series(count_serie, exclude)
+            
+        if len(translation) > 0:
+            count_serie = dataframes.translate_index_dataframe (count_serie,translation)
+        gu.create_bar(count_serie,x_labels_rotation=rotation)
+        
     def create_bubble(self, facet1_name:str, facet2_name:str):
         df_count = self.data.count_faceted_multivalued_column(facet1_name, facet2_name)
         gu.create_bubble(df_count, 'number of studies', facet1_name, facet2_name)
