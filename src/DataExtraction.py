@@ -30,7 +30,7 @@ class DataExtraction:
     
 
     @property
-    def get_df(self):
+    def get_df(self)->pd.DataFrame:
         '''
             returns the dataframe we are working with
         '''
@@ -88,6 +88,32 @@ class DataExtraction:
         df_column = self.dataframe[[id_start, column_name]]     
         return df_column
   
+    def get_single_column_with_multiple_values(self, column_name:str)->pd.DataFrame:
+        '''
+        A single column with multiple values represents a column that holds a series of comma separated items, for example
+        id |  column_name
+        ----------------------
+        0   | SPUss, Petri Nets
+        4   | undetermined
+        112 | BPMN    
+        113 | BPMN, EPC (Event Driven Process Chain)
+        @param column_name:  Name of the column we waht to manage
+        @param delimiter: Delimiter used to separate the multiple values included in each item column. The default delimiter is ";"
+        @return: It returns a dataframe with the id and the column with single values. For example, the returned dataframe for the previous example is
+        id |  column_name
+        ----------------------
+        0   | SPUss
+        0   | Petri Nets
+        4   | undetermined
+        112 | BPMN    
+        113 | BPMN
+        113 | EPC (Event Driven Process Chain)   
+        '''
+        preconditions.checkState('id_start' in self.configuration,"Should specify the name of the column for id_start")
+        preconditions.checkArgument(column_name in self.columns.keys(), "Should contain the attribute")  
+        id_start = self.configuration.get('id_start')
+        df_column = self.dataframe[[id_start, column_name]]   
+        return df.create_dataframe_from_multivalued_column(df_column, [id_start,column_name], replace_commas=True, transf_function=lambda cad:cad.strip())
 
     def count_multivalued_column(self, column_name:str)->pd.Series:  
         df =self.get_multivalued_column(column_name)
@@ -99,6 +125,12 @@ class DataExtraction:
     
     def count_single_column(self, column_name:str)->pd.Series:  
         df =self.get_single_column(column_name)
+        return df[column_name].value_counts()\
+                              .rename('number of studies',inplace=True)\
+                              .rename_axis(column_name)
+    
+    def count_single_column_with_multiple_values(self, column_name:str)->pd.Series:
+        df =self.get_single_column_with_multiple_values(column_name)
         return df[column_name].value_counts()\
                               .rename('number of studies',inplace=True)\
                               .rename_axis(column_name)

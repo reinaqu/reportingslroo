@@ -207,6 +207,7 @@ def create_dataframe_from_multivalued_column (df:pd.DataFrame, column_names:List
         ##TODO -             
     return pd.DataFrame({column_names[0]:list_id, column_names[1]:list_values})   
 
+
 def create_dataframe_from_faceted_multivalued_column_filled_with_default (df:pd.DataFrame, column_names:List[str],include:Set[str], default_facet2_value:str='n/a')->pd.DataFrame:
     '''
     @param df: dataframe with the data to be faceted
@@ -287,7 +288,7 @@ def create_dataframe_from_faceted_multivalued_column_filtered (df:pd.DataFrame, 
                       
     return pd.DataFrame({column_names[0]:list_id, column_names[1]:list_values_facet1, column_names[2]:list_values_facet2})      
 
-def create_dict_from_multivalued_column (df:pd.DataFrame)->Dict[str, Set[str]]:
+def create_dict_from_multivalued_column (df:pd.DataFrame, delimiter:str=";")->Dict[str, Set[str]]:
     '''
     @return A dictionary whose keys are the different values, and the values are
     a sortedset with the different ids
@@ -295,7 +296,7 @@ def create_dict_from_multivalued_column (df:pd.DataFrame)->Dict[str, Set[str]]:
     res = defaultdict(SortedSet)
     for id, values in df.itertuples(index=False):
         if values!=None:
-            for value in values.split(";"):
+            for value in values.split(delimiter):
                res[value].add(id)        ##TODO -             
     return res   
 
@@ -309,11 +310,24 @@ def create_dict_from_single_column (df:pd.DataFrame)->Dict[str, Set[str]]:
             res[value].add(id)        ##TODO -             
     return res   
 
-def translate_index_dataframe (df:pd.DataFrame ,translation:Dict[K,V] )->pd.DataFrame:
+def create_dict_from_single_column_with_multiple_values (df:pd.DataFrame, delimiter:str=";")->Dict[str, Set[str]]:
+    '''
+    @return A dictionary whose keys are the different values, and the values are
+    a sortedset with the different ids
+    '''
+    res = defaultdict(SortedSet)
+    for id, values in df.itertuples(index=False):
+        if values!=None:
+            for value in values.split(delimiter):
+                res[value].add(id)                     
+    return res   
+
+def translate_index_dataframe (df:pd.DataFrame ,translation:Dict[K,V], notfound_with_none:bool=False )->pd.DataFrame:
     list_indx=[]
     list_values=[]
     for indx, value in df.items():
-        list_indx.append(translation.get(indx, None))
+        default_value = None if notfound_with_none else indx
+        list_indx.append(translation.get(indx, default_value))
         list_values.append(value)
     return pd.DataFrame({'number of studies':list_values},
                         index=list_indx)    
@@ -326,6 +340,7 @@ def exclude_index_values_from_series( serie: pd.Series, exclusion:List[E])->pd.S
         index_values = [value for value in index_values if value not in exclusion]
         res = serie.filter(index_values)
     return res 
+
 
 def counter_of_column(serie:pd.Series)->Counter:
     return (serie.to_list())
