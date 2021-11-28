@@ -14,8 +14,7 @@ PublicationsQuality = TypeVar('PublicationsQuality')
 
 @dataclass( order=True)
 class PublicationsQuality:
-    """
-
+    '''
         This class stores all the info about the quality of papers Papers and different Publications written in a CSV or a xlsx.
 
         About the atributes, we have 2:
@@ -24,7 +23,7 @@ class PublicationsQuality:
 
         Besides the attributes, we have generated GETTER and SETTERS for each attributes in the class
 
-        """
+    '''
     quality_df:pd.DataFrame
     configuration: dict
 
