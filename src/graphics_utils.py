@@ -12,6 +12,9 @@ import pandas as pd
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import venn
 from typing import List
+import math
+from plotnine import *
+from plotnine.scales.scale_xy import scale_x_discrete
 
 
 MARKER_SQUARE='s'
@@ -193,7 +196,7 @@ def create_bubble(dataframe:pd.DataFrame, count_name:str, x_name:str, y_name:str
     @param y_name: Name of the column that holds the labels that will be depicted in Y-axis
     @param rows: If None, the labels depicted in X-axis 
     '''
-    #create padding column from values for circles that are neither too small nor too large
+    #create an extra padding column from values for circles that are neither too small nor too large 
     df_aux= dataframe[count_name]
     dataframe["padd"] = 2.5 * (df_aux - df_aux.min()) / (df_aux.max() - df_aux.min()) + 0.5
     fig = plt.figure()
@@ -201,7 +204,11 @@ def create_bubble(dataframe:pd.DataFrame, count_name:str, x_name:str, y_name:str
     if rows == None:
         rows = [str(row) for row in  dataframe[x_name].to_list()]
     if columns==None:
-        columns = [str(row) for row in dataframe[y_name].to_list()]
+        columns = [str(col) for col in dataframe[y_name].to_list()]
+        
+        
+    print ("Rows", rows)
+    print ("Columns", columns)    
     s = plt.scatter(rows, columns, s = 0)
     #s.remove
     ax = plt.gca()
@@ -213,7 +220,8 @@ def create_bubble(dataframe:pd.DataFrame, count_name:str, x_name:str, y_name:str
     
     #plot data row-wise as text with circle radius according to Count
     for row in dataframe.itertuples():
-        bbox_props = dict(boxstyle = "circle, pad = {}".format(row.padd), fc = "w", ec = "r", lw = 2)
+        print("1- ",row[1],"2--",row[2], "3---", row[3] )
+        bbox_props = dict(boxstyle = f"circle, pad = {row.padd}", fc = "w", ec = "r", lw = 2)
         plt.annotate(str(row[3]), xy = (row[1], row[2]), bbox = bbox_props, ha="center", va="center", zorder = 2, clip_on = False)
     #plot grid behind markers
     plt.grid(ls = "--", zorder = 1)
@@ -222,7 +230,42 @@ def create_bubble(dataframe:pd.DataFrame, count_name:str, x_name:str, y_name:str
     plt.tight_layout()
     plt.show()
 
+def create_bubble2(dataframe:pd.DataFrame, count_name:str, x_name:str, y_name:str):
+    '''
+    It createa a bubble plot with data from dataframe. The dataframe should
+    contain 3 columns, at least tree columns, one with the count, other with the X-axis
+    values, and another one with the Y-exis values.
+    @param dataframe:  Data frame with the data count. One example of this kind 
+        of dataframe is the folloing one
+                     x_name       y_name          count_name
+            0         HIGH          HIGH                 34
+            1         HIGH        MEDIUM                  5
+            2          LOW          HIGH                 51
+            3          LOW        MEDIUM                 13
+            4       MEDIUM          HIGH                 38
+            5       MEDIUM        MEDIUM                  4
+    @param count_name: Name of the column dataframe that holds the count.
+    @param x_name: Name of the column that holds the labels that will be depicted in X-axis
+    @param y_name: Name of the column that holds the labels that will be depicted in Y-axis
+    @param rows: If None, the labels depicted in X-axis 
+    '''
+    #x_values = sorted(dataframe[x_name].unique())
+    dataframe['dotsize'] = dataframe.apply(lambda row: math.sqrt(float(row[count_name]) / math.pi)*7.5, axis=1)
+    res=(ggplot(dataframe, aes(x=x_name, y=y_name)) + \
+       #scale_x_discrete(limits=x_values, breaks=x_values)  + \
+       geom_point(aes(size='dotsize'),fill='white') + \
+       geom_text(aes(label=count_name),size=8) + \
+       scale_size_identity() + \
+       theme(panel_grid_major=element_line(linetype='dashed',color='black'),
+             #panel_grid_minor=element_line(linetype='dashed',color='grey'),
+             axis_text_x=element_text(angle=90,hjust=1,vjust=0)) 
+             
+    )
+    print(res)
 
+#     res2= ggplot(dataframe, aes(x = x_name, y = "number of studies",  color = y_name)) + \
+#         geom_line(alpha = 0.5)
+#     print(res2)
     
 def create_venn4(labels, names):
     fig, ax = venn.venn4(labels, names=names)

@@ -11,6 +11,7 @@ import DataExtraction as datext
 import PublicationsQuality as pubq
 import graphics_utils as gu
 import logging
+from lxml import includes
 
 
 DashboardDataExtraction = TypeVar('DashboardDataExtraction')
@@ -112,4 +113,20 @@ class DashboardDataExtraction:
         labels =['LOW', 'MEDIUM', 'HIGH']
         gu.create_bubble(df_count, 'number of studies', intr_iq_colname, cont_iq_colname,\
                           rows=labels, columns=labels)    
+            
+       
+    def create_bubble_multivalued_single(self, multivalued_column:str, single_column:str, include:List[str]):
+        df_count = self.get_data.count_faceted_multivalued_single_column_filtered(multivalued_column, single_column,set(include))
+        rows_labels = include
+        column_labels = self.get_data.get_single_column_values(single_column)
+        single_column = self.get_data.get_config.get(single_column)
+        gu.create_bubble2(df_count, 'number of studies', single_column, multivalued_column)
         
+#     def create_line_plot_multivalued_single(self, multivalued_column:str, single_column:str, include:List[str]):
+#       df_count = self.get_data.count_faceted_multivalued_single_column_filtered(multivalued_column, single_column,set(include))
+#       col_names=['process redesign','process monitoring', 'process implementation', 'process identification', 'process discovery', 'process analysis']
+#       colours =['orange','grey', 'red', 'green', 'blue', 'pink']
+#       markers =[gu.MARKER_SQUARE,gu.MARKER_CIRCLE,gu.MARKER_SQUARE,gu.MARKER_CIRCLE, gu.MARKER_SQUARE,gu.MARKER_CIRCLE]
+#       print(df_count)
+#       single_column =self.get_data.get_config.get(single_column)
+#       gu.create_line_plot_multiple_colums(df_count,single_column, col_names, colours ,markers)

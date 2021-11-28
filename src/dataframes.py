@@ -134,6 +134,8 @@ def merge_columns_dataframe (df:pd.DataFrame, col: str, attributes: List[str])->
         res.append(values[1:])    
     return pd.DataFrame(data=res, columns=[col])
 
+
+    
 def get_attributes(df:pd.DataFrame)-> Dict[str, List[str]]:
     '''
     @param df: dataframe with Id paper, tile, data extraction columns of strings and Y/N values
@@ -213,6 +215,8 @@ def create_dataframe_from_faceted_multivalued_column_filled_with_default (df:pd.
     @param df: dataframe with the data to be faceted
     @param column_names: list of strings with exactly 3 elements. The first element of the list is an id, the second one is the name of the column corresponding
     to the first facet and the third one is the name of the column corresponding to the second facet.
+    @param include: List of values of the first facet/attribute to be included in the resulting dataset. 
+    @param default_facet2_value: 
     @return: a new dataframe
     @precondition: the list column_names only can have 3 elements
     @precondition: the dataframe df only can have 3 columns
@@ -242,7 +246,7 @@ def create_dataframe_from_faceted_multivalued_column_filtered (df:pd.DataFrame, 
     @param df: dataframe with the data to be faceted
     @param column_names: list of strings with exactly 3 elements. The first element of the list is an id, the second one is the name of the column corresponding
     to the first facet/attribute and the third one is the name of the column corresponding to the second facet/attribute.
-    @param include: List of values of the first facet/attribute to be included in the resultint dataset.    
+    @param include: List of values of the first facet/attribute to be included in the resulting dataset.    
     @precondition: the list column_names only can have 3 elements
     @precondition: the dataframe df only can have 3 columns
     @return: a new dataframe with 3 colummns: one column for the id, a second column for the facet 1, and a third column for the facet2
@@ -287,6 +291,55 @@ def create_dataframe_from_faceted_multivalued_column_filtered (df:pd.DataFrame, 
                 list_values_facet2.append(f2) 
                       
     return pd.DataFrame({column_names[0]:list_id, column_names[1]:list_values_facet1, column_names[2]:list_values_facet2})      
+
+def create_dataframe_from_faceted_multivalued_single_column_filtered (df:pd.DataFrame, id_column:str, multivalued_column:str, single_column:str, include:Set[str])->pd.DataFrame:
+    '''
+    @param df: dataframe with the data to be faceted
+    @param column_names: list of strings with exactly 3 elements. The first element of the list is an id, the second one is the name of the column corresponding
+    to the first facet/attribute and the third one is the name of the column corresponding to the second facet/attribute.
+    @param include: List of values of the first facet/attribute to be included in the resulting dataset.    
+    @precondition: the list column_names only can have 3 elements
+    @precondition: the dataframe df only can have 3 columns
+    @return: a new dataframe with 3 colummns: one column for the id, a second column for the facet 1, and a third column for the facet2
+    For example,
+    if df is the data frame 
+    ,ID Paper,Process lifecycle phase,Process analysis type
+    0,0,process analysis,verification
+    1,4,process analysis;process monitoring,prediction models;decision support
+    2,6,process monitoring
+    3,10,process monitoring
+    4,18,process identification
+    5,113,process analysis,process monitoring;decision support,
+    
+    the method will return the following dataframe when invoked as follows:
+    <code>create_dataframe_from_faceted_multivalued_column_filtered(df, ['ID Paper','Process lifecycle phase','Process analysis type'],{'process analysis'})</code>
+    note that only the values in the set include are generated in the first/facet attribute, and the second attribute/values are obtained by combining every value
+    of the second faced, with every value of the first facet for a concrete id (note that this is the cartesian product)
+    ,ID Paper,Process lifecycle phase,Process analysis type
+    0,0,process analysis,verification
+    1,4,process analysis,prediction models
+    2,4,process analysis,decision support
+    3,106,process analysis,decision support
+    4,113,process analysis,deviation detection
+    5,113,process analysis,verification
+    '''
+    preconditions.checkArgument(len(df.columns)==3, 'The dataframe only must have three columns: one with the id, the facet 1 column (multivalued) and the facet 2 column (single)')
+    
+    list_id=[]
+    list_values_facet1=[]
+    list_values_facet2=[]
+    
+    #for every tuple in the original dataset
+    for id, facet1, facet2 in df.itertuples(index=False):
+        l_facet1= commons.split_multivalued_attribute(facet1) #obtain a list with all the values for facet 1/attribute 1
+        selected_facet1_values = set(l_facet1).intersection(include) #obtain only the values of facet 1 that want to be included 
+        if len(selected_facet1_values)>0: # if the facet 1 has values to include
+            for f1 in selected_facet1_values: # iterate over the cartesian product of the values of facet1 and facet 2
+                list_id.append(id)
+                list_values_facet1.append(f1)
+                list_values_facet2.append(facet2) 
+                      
+    return pd.DataFrame({id_column:list_id, multivalued_column:list_values_facet1, single_column:list_values_facet2})      
 
 def create_dict_from_multivalued_column (df:pd.DataFrame, delimiter:str=";")->Dict[str, Set[str]]:
     '''
