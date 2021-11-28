@@ -205,10 +205,7 @@ def create_bubble(dataframe:pd.DataFrame, count_name:str, x_name:str, y_name:str
         rows = [str(row) for row in  dataframe[x_name].to_list()]
     if columns==None:
         columns = [str(col) for col in dataframe[y_name].to_list()]
-        
-        
-    print ("Rows", rows)
-    print ("Columns", columns)    
+                
     s = plt.scatter(rows, columns, s = 0)
     #s.remove
     ax = plt.gca()
@@ -220,7 +217,6 @@ def create_bubble(dataframe:pd.DataFrame, count_name:str, x_name:str, y_name:str
     
     #plot data row-wise as text with circle radius according to Count
     for row in dataframe.itertuples():
-        print("1- ",row[1],"2--",row[2], "3---", row[3] )
         bbox_props = dict(boxstyle = f"circle, pad = {row.padd}", fc = "w", ec = "r", lw = 2)
         plt.annotate(str(row[3]), xy = (row[1], row[2]), bbox = bbox_props, ha="center", va="center", zorder = 2, clip_on = False)
     #plot grid behind markers
