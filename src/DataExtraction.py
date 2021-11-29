@@ -232,3 +232,11 @@ class DataExtraction:
         facet_df =self.create_dataframe_from_faceted_multivalued_column_filled_with_default(facet1_name, facet2_name, include, default_facet2_value)
         return df.create_dataframe_facets_count(facet_df, [facet1_name, facet2_name])
     
+    def create_grouping_dict_from_multivalued_colum(self, column_name:str)->Dict[str, Set[str]]:
+        '''
+        @param column_name: Name of the multivalued column
+        @return: A dictionary in which the keys are the different values of the multivalued column and the values
+        are sets with the ids of the studies that have that value.
+        '''
+        dataframe = self.get_multivalued_column(column_name)
+        return df.create_dict_from_multivalued_column(dataframe)
