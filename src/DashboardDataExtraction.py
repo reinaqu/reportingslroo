@@ -122,9 +122,11 @@ class DashboardDataExtraction:
         single_column = self.get_data.get_config.get(single_column)
         gu.create_bubble2(df_count, 'number of studies', single_column, multivalued_column)
         
-    def create_dict_from_multivalued_column(self, column_name: str)->:
+    def create_dict_from_multivalued_column(self, column_name: str)->Dict[str, Set[str]]:
         '''
-        
+        @param column_name: Name of the column used to generate the dictionary
+        @return: A dictionary in which the keys are the different values of the multivalued column and the values
+        are sets with the ids of the studies that have that value.
         '''
         return self.get_data.create_grouping_dict_from_multivalued_colum(column_name)
 #     def create_line_plot_multivalued_single(self, multivalued_column:str, single_column:str, include:List[str]):
