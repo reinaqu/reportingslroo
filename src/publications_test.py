@@ -19,12 +19,13 @@ import DataExtraction as datext
 import DashboardDataExtraction as datextdash
 import configurations
 import KeywordClusterer as keyclus
+import test_utils
 
 from dataframes_sc import *
 import locale
 if __name__ == "__main__":
    
-    REPORT_FILE="../data/report.v.0.2.48.xls"
+    REPORT_FILE="../data/report.v.0.2.52.xls"
     AUTHORS_FILE ="../out/authors.csv"
     AUTHORS_COUNT_FILE ="../out/authors_count.csv"
     COUNTRIES_COUNT_FILE ="../out/countries_count.csv"
@@ -33,8 +34,8 @@ if __name__ == "__main__":
     BIBTEX_FILE ="../out/studies.bib"
     DATA_EXTRACTION_FILE ="../out/data_extraction.v.0.2.42.csv"
     FULL_REPORT_FILE="../data/report-all.v.0.2.37.xls"
-    AUTHORS_INPUT_FILE ="../data/all-authors.xlsx"
-    VENUES_INPUT_FILE ="../data/all-venues.xlsx"
+    AUTHORS_INPUT_FILE ="../data/all-authors-2.0.xlsx"
+    VENUES_INPUT_FILE ="../data/all-venues-2.0.xlsx"
     CONTRIBUTION_TYPE_FILE="../out/contribution_type.csv"
     PROCESS_LIFECYCLE_FILE="../out/process_lifecycle.csv"
     LIFECYCLE_ANALISIS_FILE="../out/lifecycle_analysis.csv"
@@ -63,6 +64,15 @@ if __name__ == "__main__":
     print(publ.count_studies_by_type)
       
     db = dashbd.Dashboard.of(publ)
+   
+    data_df = datext.DataExtraction.of_excel(REPORT_FILE,configurations.config_data_extraction)
+#     data_df.dataframe.to_csv(DATA_EXTRACTION_FILE)
+    datadash = datextdash.DashboardDataExtraction.of(data_df)
+    
+    test_utils.show_quality_bubble_plot(REPORT_FILE, datadash)
+
+
+
 #     db.create_piechart_studies_by_type
     #for doi in pub.get_normalized_dois:
     #    print (doi)
@@ -111,10 +121,7 @@ if __name__ == "__main__":
 #     publ.citation_df.to_csv("../out/citations.csv")
 #     dblat.generate_citations(['GoogleScholar','Scopus'])
     
-    
-    data_df = datext.DataExtraction.of_excel(REPORT_FILE,configurations.config_data_extraction)
-#     data_df.dataframe.to_csv(DATA_EXTRACTION_FILE)
-    datadash = datextdash.DashboardDataExtraction.of(data_df)
+
     
 #     contrib_type_df=data_df.get_multivalued_column("ContributionType")
 #     contrib_type_df.to_csv(CONTRIBUTION_TYPE_FILE)

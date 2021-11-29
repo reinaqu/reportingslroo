@@ -51,7 +51,6 @@ def create_dataframe_contextualIQ_count(contextualIQ_df):
     return df
 
 def create_dataframe_count(df: pd.DataFrame, column_name: str)->pd.DataFrame:
-    print(df[column_name])
     df=df[column_name].groupby([column_name]).size().reset_index(name='number of studies')
     return df
 

@@ -135,7 +135,7 @@ def create_choropleth_map (dataframe, column_name, geojson_mapfile):
     merged = world_df.merge(dataframe, how='left',left_on = COUNTRY_MAP, right_on = 'countries')
     #The NaN values are replaced by 0
     merged = merged.replace(np.nan, 0)    
-    print (merged)
+
     # set the range for the choropleth (min and max values)
     vmin, vmax=0, max(dataframe[column_name])
     
