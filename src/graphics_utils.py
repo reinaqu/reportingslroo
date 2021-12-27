@@ -15,7 +15,7 @@ from typing import List
 import math
 from plotnine import *
 from plotnine.scales.scale_xy import scale_x_discrete
-
+from cycler import cycler
 
 MARKER_SQUARE='s'
 MARKER_CIRCLE='o'
@@ -23,7 +23,7 @@ COUNTRY_MAP = 'ADMIN' # for countries.geojson
 #COUNTRY_MAP = 'name' ==> for world_countries.json
 
 
-def create_piechart(dataframe, y_name,legend=False, y_axis_label=True, font_size=9, label_distance=1.1, pct_distance=0.8):
+def create_piechart(dataframe, y_name,legend=False, y_axis_label=True, font_size=9, label_distance=1.1, pct_distance=0.8,radius=1):
     '''
     INPUT:
         -dataframe: A panda dataframe with the data to be plotted.
@@ -32,9 +32,19 @@ def create_piechart(dataframe, y_name,legend=False, y_axis_label=True, font_size
         -colours: Sequence or list of colours of the different lines
     '''
     plt.axis('equal')
+    #colors = plt.cm.plasma(np.linspace(0.4,0.95,10))
+    #colors = plt.cm.gray(np.linspace(0.2,0.8,10))
+    colors = plt.cm.magma(np.linspace(0.4,0.95,10))
+    
     ax = plt.gca()
     text_props =  {'fontsize': font_size} 
-    plot = dataframe.plot.pie(y=y_name, figsize=(5, 5),ax=ax,  pctdistance=pct_distance, labeldistance=label_distance, autopct='%1.1f%%', legend=legend, textprops=text_props)
+    wedgeprops={"edgecolor":"k",'linewidth': 1, 'linestyle': 'solid', 'antialiased': True}
+    plot = dataframe.plot.pie(y=y_name, figsize=(5, 5),ax=ax,  \
+                              wedgeprops=wedgeprops,\
+                              pctdistance=pct_distance,colors=colors, \
+                              labeldistance=label_distance, autopct='%1.1f%%', \
+                              legend=legend, textprops=text_props)
+    
     if y_axis_label==False:
         ax.set_ylabel('')
     plt.show()
