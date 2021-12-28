@@ -158,7 +158,7 @@ def get_attributes(df:pd.DataFrame)-> Dict[str, List[str]]:
         if len(splits) > 1:
             #Start has a bug and generates the name of the last columnn of an attribute
             #with a ]
-            value= splits[1].replace("]","").strip()
+            value= splits[1].replace("]","").replace("}","").strip()
             res[attr_name].append(value)
         else:
             res[attr_name]=[]
