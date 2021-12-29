@@ -52,7 +52,7 @@ config_venues ={'venue':'Venue',
     
 config_data_extraction ={'skip_rows': 7, 
              'sheet_name':'Papers',
-             'use_cols':[0,1,9]+[n for n in range(35,135)],
+             'use_cols':[0,1,9]+[n for n in range(34,135)],
              'id_start': 'ID Paper',
              'title': 'Title',
              'year':'Year'
