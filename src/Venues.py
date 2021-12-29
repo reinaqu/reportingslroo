@@ -39,7 +39,18 @@ class Venues:
         '''
         return self.configuration
 
+    @property
+    def get_count_col(self):
+        return 'number of studies'
+    
+    @property
+    def get_venues_name_col(self):
+        return self.get_config.get('venue')
 
+    @property
+    def get_type_name_col(self):
+        return self.get_config.get('type')
+    
     @staticmethod
     def of_dataframe(dataframe:pd.DataFrame, config: dict)->Venues:
         return Venues (dataframe, config)

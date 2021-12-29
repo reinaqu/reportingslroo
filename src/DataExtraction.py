@@ -220,7 +220,6 @@ class DataExtraction:
     def count_faceted_multivalued_single_column_filtered(self, facet1_multuvalued_name:str, facet2_single_name:str, include:Set[str])->pd.DataFrame:
         
         df_faceted = self.get_faceted_multivalued_single_column_filtered(facet1_multuvalued_name, facet2_single_name, include)
-        print("middle-->", df_faceted)
         facet2_single_name = self.configuration.get(facet2_single_name)
         return df.create_dataframe_facets_count(df_faceted, [facet1_multuvalued_name,facet2_single_name])   
                               

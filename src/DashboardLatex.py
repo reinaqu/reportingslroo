@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from typing import TypeVar, List
 import Publications as pub
 import Venues as ven
+import Authors as aut
 
 
 DashboardLatex = TypeVar('DashboardLatex')
@@ -34,10 +35,11 @@ class DashboardLatex:
     '''
     publications: pub.Publications
     venues: ven.Venues
+    authors: aut.Authors
     
     @staticmethod   
     def of(publications:pub.Publications) -> DashboardLatex:
-        return DashboardLatex(publications,None)
+        return DashboardLatex(publications,None, None)
        
     @property
     def get_publications(self) -> pub.Publications:
@@ -46,9 +48,16 @@ class DashboardLatex:
     @property
     def get_venues(self) -> ven.Venues:
         return self.venues    
-       
+
+    @property
+    def get_authors(self) -> aut.Authors:
+        return self.authors    
+           
     def set_venues(self, venues:ven.Venues)->None:
         self.venues = venues
+
+    def set_authors(self, authors:aut.Authors)->None:
+        self.authors = authors
         
     def generate_citations(self, source_list: List[str])->str:
         
@@ -99,4 +108,33 @@ class DashboardLatex:
             
             print(txt.format(study_id,study_id,title, authors, venue, year)) 
 
-                
+    def generate_authors(self):            
+        
+        '''
+        It prints on the standard output the list of authors and their number of publications in latex format.
+         An example ot the output for a concrete author is the following one:
+   
+        Mathias Weske       & 12\\
+        '''
+        df = self.authors.count_number_of_studies_per_author
+ 
+        for _, row in df.iterrows():
+            author_name_col = self.get_authors.get_author_name_col
+            count_col = self.get_authors.get_count_col
+            author = row[author_name_col]            
+            count = row[count_col]
+            
+            print(f"{author} & {count} \\\\ ") 
+    
+    def generate_venues(self):
+        df = self.get_venues.count_number_of_studies_per_venue
+        rank = 1
+        for _, row in df.iterrows():
+            venue_name_col = self.get_venues.get_venues_name_col
+            type_name_col = self.get_venues.get_type_name_col
+            count_col = self.get_venues.get_count_col
+            venue = row[venue_name_col]
+            type = row[type_name_col]
+            number = row [count_col]   
+            print(f"{rank} & {venue} & {type} & {number} \\\\ ") 
+            rank+=1

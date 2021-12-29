@@ -59,6 +59,15 @@ class Authors:
         dataframe = pd.read_excel(url, sheet_name=sheetname, skiprows=skip_rows,usecols=use_cols)
         return Authors(dataframe, config)
 
+    
+    @property
+    def get_count_col(self):
+        return 'number of studies'
+    
+    @property
+    def get_author_name_col(self):
+        return self.get_config.get('author_name')
+    
     @property
     def count_number_of_studies_per_author(self)->pd.DataFrame:
         preconditions.checkArgument('author_ID' in self.configuration,"Should specify the name of the column for author id")
