@@ -173,7 +173,7 @@ class Authors:
         #create a dictionary {country: Set(id_study)} ==> {str:Set(str)} (dict_countries)
         dict_countries = dataframes.create_dict_from_multivalued_column(df_column)
         #create a dictionary {id_study: int} that relates a study and the number of different countries that participate in that study
-        dict_count = {id:len(ss) for id, ss in dict_countries.items()}
+        dict_count = {id_study:len(ss) for id_study, ss in dict_countries.items()}
         #sort the dictionary by the number of countries descending
         count_sorted =sorted(dict_count.items(), key=lambda t:t[1], reverse=True)
         names, counts = zip(*count_sorted)
