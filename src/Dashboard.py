@@ -20,7 +20,7 @@ class Dashboard:
     '''
 
         This class represents a dashboard that holds all the operations that can be executed with data related to the publications
-        themselves. That is, operatations that are common to every sytematic literature review and that do not depend on the
+        themselves. That is, operatations that are common to every systematic literature review and that do not depend on the
         specific domain of the review.
 
         The class has three attributes:
