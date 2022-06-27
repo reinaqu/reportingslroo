@@ -6,13 +6,14 @@ Created on 6 ago. 2021
 '''
 import commons
 
-searches_conf = {'ACM': [0, 6, 7],
-                       'Springer': [1, 8, 9],
-                       'Science Direct': [2, 12, 13],
-                       'IEEE': [3,10,11],
-                       'Scopus':[4,14,15],
-                       'Google Academic': [5,16,17],
-                       'Snowballing':[n for n in range(18,185)]}
+searches_conf = {'ACM': [0, 6, 7, 185],
+                       'Springer': [1, 8, 9, 193,194,195],
+                       'Science Direct': [2, 12, 13,187,188],
+                       'IEEE': [3,10,11,186],
+                       'Scopus':[4,14,15,189],
+                       'Google Academic': [5,16,17,190,191,192],
+                       'Backward Snowballing':[n for n in range(18,185)]+[n for n in range(315,330)]+[342,344,344,246,348,350,352,353,354],
+                       'Forward Snowballing':[n for n in range(196,315)]+[n for n in range(320,342)]+[345,347,349,351,355,356]}
 
 config_publ ={'skip_rows': 7, 
              'sheet_name':'Papers',
