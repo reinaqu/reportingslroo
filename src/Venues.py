@@ -55,17 +55,17 @@ class Venues:
     def of_dataframe(dataframe:pd.DataFrame, config: dict)->Venues:
         return Venues (dataframe, config)
     @staticmethod
-    def of_csv(url: str, config: dict) -> Venues:
+    def of_csv(filename: str, config: dict) -> Venues:
         skip_rows= config.get('skip_rows')
-        dataframe = pd.read_csv(url, skiprows=skip_rows)
+        dataframe = pd.read_csv(filename, skiprows=skip_rows)
         return Venues(dataframe, config)
 
     @staticmethod
-    def of_excel(url: str, config: dict) -> Venues:
+    def of_excel(filename: str, config: dict) -> Venues:
         use_cols= config.get('use_cols')
         skip_rows= config.get('skip_rows')
         sheetname=config.get('sheet_name')
-        dataframe = pd.read_excel(url, sheet_name=sheetname, skiprows=skip_rows,usecols=use_cols)
+        dataframe = pd.read_excel(filename, sheet_name=sheetname, skiprows=skip_rows,usecols=use_cols)
         return Venues(dataframe, config)
 
     @property
@@ -94,7 +94,7 @@ class Venues:
     def count_venues_per_type(self)->pd.DataFrame:
         df_count = self.count_number_of_studies_per_venue
         type_col = self.configuration.get('type')
-        return dataframes.create_dataframe_facets_count(df_count, [type_col])
+        return dataframes.create_dataframe_facets_count(df_count, [type_col], label='number of venues')
 
     def get_venue(self, id_study:str)->str:
         '''

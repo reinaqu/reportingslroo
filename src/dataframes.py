@@ -54,9 +54,9 @@ def create_dataframe_count(df: pd.DataFrame, column_name: str)->pd.DataFrame:
     df=df[column_name].groupby([column_name]).size().reset_index(name='number of studies')
     return df
 
-def create_dataframe_facets_count(facet_df:pd.DataFrame, facet_names:List[str])->pd.DataFrame:
+def create_dataframe_facets_count(facet_df:pd.DataFrame, facet_names:List[str], label='number of studies')->pd.DataFrame:
     #df= quality_df[[Idf=df.set_index(FOCUS)D_PAPER,'IntrinsicIQ']].groupby(['IntrinsicIQ']).agg(name=('number of studies','count'))
-    df=facet_df.groupby(facet_names).size().reset_index(name='number of studies')    
+    df=facet_df.groupby(facet_names).size().reset_index(name=label)    
     return df
 
 def fill_gaps_with_zeros(df:pd.DataFrame)-> None:
