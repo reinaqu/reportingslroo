@@ -17,6 +17,7 @@ from plotnine import *
 from plotnine.scales.scale_xy import scale_x_discrete
 from cycler import cycler
 
+
 MARKER_SQUARE='s'
 MARKER_CIRCLE='o'
 COUNTRY_MAP = 'ADMIN' # for countries.geojson
@@ -41,7 +42,8 @@ def create_piechart(dataframe, y_name,legend=False, y_axis_label=True, font_size
     wedgeprops={"edgecolor":"k",'linewidth': 1, 'linestyle': 'solid', 'antialiased': True}
     plot = dataframe.plot.pie(y=y_name, figsize=(5, 5),ax=ax,  \
                               wedgeprops=wedgeprops,\
-                              pctdistance=pct_distance,colors=colors, \
+                              pctdistance=pct_distance,\
+                              colors=colors, \
                               labeldistance=label_distance, autopct='%1.1f%%', \
                               legend=legend, textprops=text_props)
     
@@ -284,3 +286,4 @@ def create_venn3(labels, names):
 
     #fig.savefig('venn4.png', bbox_inches='tight')
     plt.show()
+    

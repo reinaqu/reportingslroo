@@ -25,6 +25,7 @@ class PublicationsQuality:
 
     '''
     quality_df:pd.DataFrame
+    completness_df:pd.DataFrame
     configuration: dict
 
 
@@ -38,27 +39,30 @@ class PublicationsQuality:
 
 
     @staticmethod
-    def of_csv(url: str, config: dict) -> PublicationsQuality:
+    def of_csv(filename: str, config: dict) -> PublicationsQuality:
         skip_rows= config.get('skip_rows')
-        dataframe = pd.read_csv(url, skiprows=skip_rows)
+        dataframe = pd.read_csv(filename, skiprows=skip_rows)
         return PublicationsQuality(dataframe, config, None, None)
 
     @staticmethod
-    def of_excel(url: str, config: dict) -> PublicationsQuality:
-        quality_df = pd.read_excel(url, \
+    def of_excel(filename: str, config: dict) -> PublicationsQuality:
+        quality_df = pd.read_excel(filename, \
                                        sheet_name=config.get("quality_sheet_name"), \
                                        skiprows=config.get('qualtiy_skip_rows'))
         id = config.get('id_start')
         intrinsic_iq = config.get('intrinsic_iq')
         contextual_iq = config.get('contextual_iq')
+        completness_df = quality_df[config.get('completness')]
         quality_df = quality_df[[id, intrinsic_iq, contextual_iq]]
   
-        return PublicationsQuality(quality_df, config)
+        return PublicationsQuality(quality_df, completness_df, config)
     
     @property
     def get_quality_dataframe(self)->pd.DataFrame:
         return self.quality_df
-  
+    @property
+    def get_completness_dataframe(self)->pd.DataFrame:
+        return self.completness_df
     @property
     def get_id_study_colname(self):
             return self.configuration.get('id_start')
@@ -68,7 +72,9 @@ class PublicationsQuality:
     @property
     def get_intrinsic_iq_colname(self):
         return self.configuration.get('intrinsic_iq')
-        
+    @property
+    def get_completness_colname(self):
+        return self.configuration.get('completness')       
     
     @property
     def count_pairs_per_quality_measure(self)->pd.DataFrame:
@@ -86,3 +92,7 @@ class PublicationsQuality:
         return dataframes.create_dataframe_facets_count(self.get_quality_dataframe, \
                                             col_names)
     
+    def count_completness_data(self)->pd.DataFrame:
+        return self.get_completness_dataframe.value_counts()\
+                                .sort_index()
+
