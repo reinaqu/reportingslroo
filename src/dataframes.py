@@ -211,7 +211,8 @@ def create_dataframe_from_multivalued_column (df:pd.DataFrame, column_names:List
         ##TODO -             
     return pd.DataFrame({column_names[0]:list_id, column_names[1]:list_values})   
 
-def create_dataframe_from_multivalued_columns (df:pd.DataFrame, column_names:List[str], replace_commas:bool=False, transf_functions:List[Callable]=[None, None],\
+def create_dataframe_from_multivalued_columns (df:pd.DataFrame, column_names:List[str], replace_commas:bool=False, \
+                                               transf_functions:List[Callable]=[None, None],\
                                                exclude:List[Any]=None)->pd.DataFrame:
     preconditions.checkArgument(len(column_names)==2, 'The list only must have two column names: the id column_name and the column name that is the aim of the dataframe')
     values_1 = []
@@ -219,8 +220,9 @@ def create_dataframe_from_multivalued_columns (df:pd.DataFrame, column_names:Lis
     for v1, v2 in df.itertuples(index=False):
         list_values1 = create_list_values(v1, replace_commas, transf_functions[0])
         list_values2 = create_list_values(v2, replace_commas, transf_functions[1])
-        list_values1 = set(list_values1) - set(exclude)
-        list_values2 = set(list_values2) - set(exclude)
+        if exclude != None:
+            list_values1 = set(list_values1) - set(exclude)
+            list_values2 = set(list_values2) - set(exclude)
 
         for val1, val2 in  itertools.product(list_values1, list_values2):
             values_1.append(val1.strip())

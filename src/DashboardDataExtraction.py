@@ -337,8 +337,7 @@ class DashboardDataExtraction:
     def create_tree_map_from_multivalued_columns(self, outer_name:str, inner_name:str, \
                                                  translations:List[Dict[K,V]]=[None, None]):
         facets = [outer_name, inner_name]
-        print(self.get_data)
-        count_serie = self.get_data.create_dataframe_facets_count_from_multivalued_column (facets)             
+        count_serie = self.get_data.create_dataframe_facets_count_from_multivalued_column (facets, translation_dicts=translations)             
         count_name= "number of studies"
         gu.create_treemap_graph(count_serie, count_name, outer_name, inner_name)
         
