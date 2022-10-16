@@ -305,7 +305,9 @@ class DashboardDataExtraction:
         df_count = self.get_data.count_faceted_multivalued_single_column_filtered(multivalued_column, single_column,set(include))
             
         rows_labels = include
-        df_count= dataframes.translate_column(df_count, multivalued_column, translation)
+        if len(translation)>0:
+            df_count= dataframes.translate_column(df_count, multivalued_column, translation)
+
         column_labels = self.get_data.get_single_column_values(single_column)
         single_column = self.get_data.get_config.get(single_column)
         gu.create_bubble2(df_count, 'number of studies', single_column, multivalued_column)
@@ -344,11 +346,9 @@ class DashboardDataExtraction:
         
     def create_sankey_from_multivalued_columns(self, source_column: str, target_column:str, exclude:List[Any]=None, replace_commas:bool=False):
         
-        print(self.get_data)
         facets = [source_column, target_column]
         count_serie = self.get_data.create_dataframe_facets_count_from_multivalued_column (facets, exclude=exclude, replace_commas=replace_commas)             
         count_name= "number of studies"
-        print (count_serie)
         title = f"{source_column} vs {target_column}"
         gu.create_sankey(count_serie, source_column, target_column, "number of studies", title)
         
