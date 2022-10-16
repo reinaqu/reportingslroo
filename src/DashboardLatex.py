@@ -92,8 +92,11 @@ class DashboardLatex:
         authors_col = self.publications.get_authors_colname      
         venue_col = self.publications.get_venue_colname
         year_col = self.publications.get_year_colname
+#         txt='''% id -start: {} -------------------------------------------  
+#              \\citeS{{{} }} & {} & {} & {},{}\\\\'''
+
         txt='''% id -start: {} -------------------------------------------  
-             \\citeS{{{} }} & {} & {} & {},{}\\\\'''
+             \\citeS{{{} }} & {} & {},{}\\\\'''
 
         for _, row in df.iterrows():
 
@@ -106,7 +109,8 @@ class DashboardLatex:
                 venue = row[venue_col]
             year = row[year_col]
             
-            print(txt.format(study_id,study_id,title, authors, venue, year)) 
+#           print(txt.format(study_id,study_id,title, authors, venue, year)) 
+            print(txt.format(study_id,study_id,title, venue, year)) 
 
     def generate_authors(self):            
         
@@ -136,5 +140,7 @@ class DashboardLatex:
             venue = row[venue_name_col]
             type = row[type_name_col]
             number = row [count_col]   
-            print(f"{rank} & {venue} & {type} & {number} \\\\ ") 
+            print(f"{rank} & \\textsf{{ {venue} }} & {type} & {number} \\\\ ") 
             rank+=1
+                   
+        

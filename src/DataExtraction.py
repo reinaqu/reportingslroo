@@ -2,7 +2,7 @@
 import pandas as pd
 import dataframes as df
 from dataclasses import dataclass
-from typing import TypeVar, Dict, List, Set
+from typing import TypeVar, Dict, List, Set, Any
 from builtins import staticmethod
 import preconditions
 import logging
@@ -10,6 +10,8 @@ from sortedcontainers.sortedset import SortedSet
 
 DataExtraction = TypeVar('DataExtraction')
 E = TypeVar('E')
+K = TypeVar('K')
+V = TypeVar('V')
 
 @dataclass( order=True)
 class DataExtraction:
@@ -25,7 +27,7 @@ class DataExtraction:
 
         """
     dataframe: pd.DataFrame
-    configuration: dict
+    configuration: Dict [K,V]
     columns: Dict[str, List[str]]
     attributes : Dict[str, List[str]]
     
@@ -45,10 +47,10 @@ class DataExtraction:
         return self.configuration
 
     @staticmethod
-    def of_csv(url: str, config: dict) -> DataExtraction:
+    def of_csv(filename: str, config: dict) -> DataExtraction:
         skip_rows= config.get('skip_rows')
         use_cols= config.get('use_cols')
-        dataframe = pd.read_csv(url, skiprows=skip_rows,usecols=use_cols)
+        dataframe = pd.read_csv(filename, skiprows=skip_rows,usecols=use_cols)
         attributes = df.get_attributes(dataframe)
         #list_keys = [k for k in attributes.keys()]
         columns = df.get_columns(dataframe)
@@ -56,12 +58,12 @@ class DataExtraction:
         return DataExtraction(dataframe, config, columns, attributes)
 
     @staticmethod
-    def of_excel(url: str, config: dict) -> DataExtraction:
+    def of_excel(filename: str, config: dict) -> DataExtraction:
         use_cols= config.get('use_cols')
         skip_rows= config.get('skip_rows')
         sheetname=config.get('sheet_name')
-        dataframe = pd.read_excel(url, sheet_name=sheetname, skiprows=skip_rows,usecols=use_cols)
-        logging.info('Loaded dataframe from {} with {} rows'.format(url, len(dataframe.index)) )
+        dataframe = pd.read_excel(filename, sheet_name=sheetname, skiprows=skip_rows,usecols=use_cols)
+        logging.info('Loaded dataframe from {} with {} rows'.format(filename, len(dataframe.index)) )
         attributes = df.get_attributes(dataframe)
         #list_keys = [k for k in attributes.keys()]
         columns = df.get_columns(dataframe)
@@ -156,7 +158,7 @@ class DataExtraction:
         preconditions.checkArgument(facet2_name in self.columns.keys(), "Should contain the attribute "+ facet2_name)  
         id_start = self.configuration.get('id_start')
         df_column = self.dataframe[[id_start, facet1_name, facet2_name]]     
-        return df.create_dataframe_from_faceted_multivalued_column(df_column, [id_start,facet1_name, facet2_name])
+        return df.create_dataframe_from_faceted_multivalued_column_filtered(df_column, [id_start,facet1_name, facet2_name])
     
     def get_faceted_multivalued_column_filtered(self, facet1_name:str, facet2_name:str, include:Set[str])->pd.DataFrame:
         '''
@@ -190,7 +192,7 @@ class DataExtraction:
         preconditions.checkArgument(facet2_single_name in self.configuration, f"Should specify the name of the column for { facet2_single_name}")  
         id_start = self.configuration.get('id_start')
         facet2_single_name = self.configuration.get(facet2_single_name)
-        df_column = self.dataframe[[id_start, facet1_multivalued_name, facet2_single_name]]     
+        df_column = self.dataframe[[id_start, facet1_multivalued_name, facet2_single_name]]   
         return df.create_dataframe_from_faceted_multivalued_single_column_filtered(df_column, id_start,facet1_multivalued_name, facet2_single_name, include=include)
     
     def create_dataframe_from_faceted_multivalued_column_filled_with_default(self, facet1_name:str, facet2_name:str, include:Set[str], default_facet2_value:str='n/a')->pd.DataFrame:
@@ -218,13 +220,14 @@ class DataExtraction:
                               .rename_axis(facet2_name)
                               
     def count_faceted_multivalued_single_column_filtered(self, facet1_multuvalued_name:str, facet2_single_name:str, include:Set[str])->pd.DataFrame:
-        
+      
         df_faceted = self.get_faceted_multivalued_single_column_filtered(facet1_multuvalued_name, facet2_single_name, include)
         facet2_single_name = self.configuration.get(facet2_single_name)
         return df.create_dataframe_facets_count(df_faceted, [facet1_multuvalued_name,facet2_single_name])   
                               
     def count_faceted_multivalued_column(self, facet1_name:str, facet2_name:str)->pd.DataFrame:  
         facet_df =self.get_faceted_multivalued_column(facet1_name, facet2_name)
+         
         return df.create_dataframe_facets_count(facet_df, [facet1_name, facet2_name])
     
     def count_faceted_multivalued_column_filled_with_default(self,facet1_name:str, facet2_name:str, include:Set[str],default_facet2_value:str='n/a' )->pd.DataFrame:
@@ -239,3 +242,30 @@ class DataExtraction:
         '''
         dataframe = self.get_multivalued_column(column_name)
         return df.create_dict_from_multivalued_column(dataframe)
+    
+    def create_grouping_dict_from_single_colum(self, column_name:str)->Dict[str, Set[str]]:
+        '''
+        @param column_name: Name of the multivalued column
+        @return: A dictionary in which the keys are the different values of the multivalued column and the values
+        are sets with the ids of the studies that have that value.
+        '''
+        dataframe = self.get_single_column_with_multiple_values(column_name)
+        return df.create_dict_from_multivalued_column(dataframe)
+    
+    def create_dataframe_facets_count_from_multivalued_column(self, facet_names:List[str], translation_dicts:List[Dict[K,V]]=[None, None],label='number of studies',
+                                                              exclude:List[Any]=None, replace_commas:bool=False)->pd.DataFrame:
+        preconditions.checkArgument(len(facet_names)==2, 'The list only must have two column names')
+        preconditions.checkArgument(len(translation_dicts)==2, 'The list only must have two dicts')
+        #Select the facetes columns
+        facet_df = self.get_df[facet_names]
+        #Obtain a dataframe with the multivalued columns flattened
+        facet_df = df.create_dataframe_from_multivalued_columns(facet_df, facet_names, exclude=exclude, replace_commas=replace_commas)
+        facet_df =df.create_dataframe_facets_count (facet_df, facet_names)
+
+        #Translate values of columns if needed
+        for i in range(len(translation_dicts)):
+            if translation_dicts[i] != None:
+                facet_df = df.translate_column(facet_df, facet_names[i], translation_dicts[i])
+       
+        #facet_df.to_csv("../out/challenges-cycles-tr.csv")            
+        return facet_df

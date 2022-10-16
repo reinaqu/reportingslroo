@@ -70,7 +70,7 @@ class Dashboard:
         '''
         df =self.publications.count_studies_by_type
         #font_size=9, label_distance=1.1, pct_distance=0.8,radius=1)
-        gu.create_piechart(df,'number of studies',y_axis_label=False, font_size=12, label_distance=1.2, pct_distance=1.1)
+        gu.create_piechart(df,'number of studies',y_axis_label=False, font_size=16, label_distance=1.2, pct_distance=1.1)
         
     @property
     def create_plot_studies_by_year(self)->None:

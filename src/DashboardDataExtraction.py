@@ -6,7 +6,7 @@ Created on 10 jul. 2021
 import pandas as pd
 import dataframes
 from dataclasses import dataclass
-from typing import TypeVar,List,Dict, Set
+from typing import TypeVar,List,Dict, Set, Any
 import DataExtraction as datext
 import PublicationsQuality as pubq
 import graphics_utils as gu
@@ -117,7 +117,7 @@ class DashboardDataExtraction:
         if len(translation) > 0:
             count_serie = dataframes.translate_index_dataframe (count_serie,translation)
             
-        gu.create_piechart(count_serie, 'number of studies', y_axis_label=False, font_size=14, label_distance=1.1, pct_distance=0.8)
+        gu.create_piechart(count_serie, 'number of studies', y_axis_label=False, font_size=16, label_distance=1.1, pct_distance=0.8)
     
     def create_bar_count_multivalued_column(self, column_name:str, rotation:int=90, translation:Dict[K,V]={}, exclude:List[K]=[])->None:    
         '''
@@ -301,9 +301,11 @@ class DashboardDataExtraction:
         dataframe = self.get_publications_quality.count_completness_data()
         gu.create_bar(dataframe)
            
-    def create_bubble_multivalued_single(self, multivalued_column:str, single_column:str, include:List[str]):
+    def create_bubble_multivalued_single(self, multivalued_column:str, single_column:str, include:List[str],translation:Dict[K,V]={}):
         df_count = self.get_data.count_faceted_multivalued_single_column_filtered(multivalued_column, single_column,set(include))
+            
         rows_labels = include
+        df_count= dataframes.translate_column(df_count, multivalued_column, translation)
         column_labels = self.get_data.get_single_column_values(single_column)
         single_column = self.get_data.get_config.get(single_column)
         gu.create_bubble2(df_count, 'number of studies', single_column, multivalued_column)
@@ -332,4 +334,22 @@ class DashboardDataExtraction:
         '''
         return self.get_data.create_grouping_dict_from_single_colum(column_name)
     
-    
+    def create_tree_map_from_multivalued_columns(self, outer_name:str, inner_name:str, \
+                                                 translations:List[Dict[K,V]]=[None, None]):
+        facets = [outer_name, inner_name]
+        print(self.get_data)
+        count_serie = self.get_data.create_dataframe_facets_count_from_multivalued_column (facets)             
+        count_name= "number of studies"
+        gu.create_treemap_graph(count_serie, count_name, outer_name, inner_name)
+        
+        
+    def create_sankey_from_multivalued_columns(self, source_column: str, target_column:str, exclude:List[Any]=None, replace_commas:bool=False):
+        
+        print(self.get_data)
+        facets = [source_column, target_column]
+        count_serie = self.get_data.create_dataframe_facets_count_from_multivalued_column (facets, exclude=exclude, replace_commas=replace_commas)             
+        count_name= "number of studies"
+        print (count_serie)
+        title = f"{source_column} vs {target_column}"
+        gu.create_sankey(count_serie, source_column, target_column, "number of studies", title)
+        

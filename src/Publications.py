@@ -52,17 +52,17 @@ class Publications:
 
 
     @staticmethod
-    def of_csv(url: str, config: dict) -> Publications:
+    def of_csv(filename: str, config: dict) -> Publications:
         skip_rows= config.get('skip_rows')
-        dataframe = pd.read_csv(url, skiprows=skip_rows)
+        dataframe = pd.read_csv(filename, skiprows=skip_rows)
         return Publications(dataframe, config, None, None)
 
     @staticmethod
-    def of_excel(url: str, config: dict) -> Publications:
+    def of_excel(filename: str, config: dict) -> Publications:
         use_cols= config.get('use_cols')
         skip_rows= config.get('skip_rows')
         sheetname=config.get('sheet_name')
-        dataframe = pd.read_excel(url, sheet_name=sheetname, skiprows=skip_rows,usecols=use_cols)
+        dataframe = pd.read_excel(filename, sheet_name=sheetname, skiprows=skip_rows,usecols=use_cols)
         return Publications(dataframe, config, None, None)
     
     @property

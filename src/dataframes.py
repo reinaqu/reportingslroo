@@ -8,13 +8,14 @@ related to slrs or mapping studies in general
 '''
 
 
-from typing import TypeVar,Callable,Dict,List, Set
+from typing import TypeVar,Callable,Dict,List, Set, Any
 from collections import defaultdict, Counter
 import pandas as pd 
 from sortedcontainers.sortedset import SortedSet
 import preconditions
 import itertools
 import commons
+
 
 E = TypeVar('E')
 K = TypeVar('K')
@@ -58,6 +59,8 @@ def create_dataframe_facets_count(facet_df:pd.DataFrame, facet_names:List[str], 
     #df= quality_df[[Idf=df.set_index(FOCUS)D_PAPER,'IntrinsicIQ']].groupby(['IntrinsicIQ']).agg(name=('number of studies','count'))
     df=facet_df.groupby(facet_names).size().reset_index(name=label)    
     return df
+
+
 
 def fill_gaps_with_zeros(df:pd.DataFrame)-> None:
     '''
@@ -208,6 +211,34 @@ def create_dataframe_from_multivalued_column (df:pd.DataFrame, column_names:List
         ##TODO -             
     return pd.DataFrame({column_names[0]:list_id, column_names[1]:list_values})   
 
+def create_dataframe_from_multivalued_columns (df:pd.DataFrame, column_names:List[str], replace_commas:bool=False, transf_functions:List[Callable]=[None, None],\
+                                               exclude:List[Any]=None)->pd.DataFrame:
+    preconditions.checkArgument(len(column_names)==2, 'The list only must have two column names: the id column_name and the column name that is the aim of the dataframe')
+    values_1 = []
+    values_2 = []
+    for v1, v2 in df.itertuples(index=False):
+        list_values1 = create_list_values(v1, replace_commas, transf_functions[0])
+        list_values2 = create_list_values(v2, replace_commas, transf_functions[1])
+        list_values1 = set(list_values1) - set(exclude)
+        list_values2 = set(list_values2) - set(exclude)
+
+        for val1, val2 in  itertools.product(list_values1, list_values2):
+            values_1.append(val1.strip())
+            values_2.append(val2.strip())
+
+    return pd.DataFrame({column_names[0]:values_1, column_names[1]:values_2})   
+
+def create_list_values(values:List[str], replace_commas:bool=False, transf_function:Callable=None):
+    list_values = []
+    if values!=None:
+        if replace_commas==True:
+            values = values.replace(",",";")             
+        for value in values.split(";"):
+            if transf_function != None:
+                value = transf_function(value)
+            list_values.append(value)
+    return list_values
+            
 
 def create_dataframe_from_faceted_multivalued_column_filled_with_default (df:pd.DataFrame, column_names:List[str],include:Set[str], default_facet2_value:str='n/a')->pd.DataFrame:
     '''
@@ -240,7 +271,7 @@ def create_dataframe_from_faceted_multivalued_column_filled_with_default (df:pd.
                 
     return pd.DataFrame({column_names[0]:list_id, column_names[1]:list_values_facet1, column_names[2]:list_values_facet2})   
 
-def create_dataframe_from_faceted_multivalued_column_filtered (df:pd.DataFrame, column_names:List[str], include:Set[str])->pd.DataFrame:
+def create_dataframe_from_faceted_multivalued_column_filtered (df:pd.DataFrame, column_names:List[str], include:Set[str]=None)->pd.DataFrame:
     '''
     @param df: dataframe with the data to be faceted
     @param column_names: list of strings with exactly 3 elements. The first element of the list is an id, the second one is the name of the column corresponding
@@ -282,7 +313,11 @@ def create_dataframe_from_faceted_multivalued_column_filtered (df:pd.DataFrame, 
     for id, facet1, facet2 in df.itertuples(index=False):
         l_facet1= commons.split_multivalued_attribute(facet1) #obtain a list with all the values for facet 1/attribute 1
         l_facet2=commons.split_multivalued_attribute(facet2) #obtain a list with all the values for facet 2/attribute 2
-        selected_facet1_values = set(l_facet1).intersection(include) #obtain only the values of facet 1 that want to be included 
+        if (include != None):
+            selected_facet1_values = set(l_facet1).intersection(include) #obtain only the values of facet 1 that want to be included
+        else:
+             selected_facet1_values= l_facet1
+             
         if len(selected_facet1_values)>0: # if the facet 1 has values to include
             for f1, f2 in itertools.product(selected_facet1_values, l_facet2): # iterate over the cartesian product of the values of facet1 and facet 2
                 list_id.append(id)
@@ -385,6 +420,17 @@ def translate_index_dataframe (df:pd.DataFrame ,translation:Dict[K,V], notfound_
                         index=list_indx)    
     
 
+def translate_column(df:pd.DataFrame ,column_name: str, translation:Dict[K,V])->pd.DataFrame:
+    '''
+    @param df: A panda dataframe
+    @param column_name: The name of the column to be translated
+    @param translation: A dictionary whose keys are the values of the column, and whose values 
+        are the corresponding translations.
+    @return: A new dataframe with the column translated.
+    '''
+    df[column_name] = df[column_name].map(lambda x: translation.get(x))
+    return df
+
 def exclude_index_values_from_series( serie: pd.Series, exclusion:List[E])->pd.Series:
     res = serie
     if (len(exclusion)>0):
@@ -393,7 +439,15 @@ def exclude_index_values_from_series( serie: pd.Series, exclusion:List[E])->pd.S
         res = serie.filter(index_values)
     return res 
 
+def get_column_unique_values(df:pd.DataFrame ,column_name: str)->Set[Any]:
+    '''
+    @param df: A panda dataframe
+    @param column_name: The name of the column to be translated
+    @return: A list with the different values (without duplicates) of the column.
+    '''
+    return set(df[column_name].tolist())
+    
 
-def counter_of_column(serie:pd.Series)->Counter:
-    return (serie.to_list())
+# def counter_of_column(serie:pd.Series)->Counter:
+#     return (serie.to_list())
     

@@ -16,6 +16,8 @@ import math
 from plotnine import *
 from plotnine.scales.scale_xy import scale_x_discrete
 from cycler import cycler
+import plotly.express as px
+import plotly.graph_objects as go
 
 
 MARKER_SQUARE='s'
@@ -257,6 +259,7 @@ def create_bubble2(dataframe:pd.DataFrame, count_name:str, x_name:str, y_name:st
     @param y_name: Name of the column that holds the labels that will be depicted in Y-axis
     @param rows: If None, the labels depicted in X-axis 
     '''
+
     #x_values = sorted(dataframe[x_name].unique())
     dataframe['dotsize'] = dataframe.apply(lambda row: math.sqrt(float(row[count_name]) / math.pi)*7.5, axis=1)
     res=(ggplot(dataframe, aes(x=x_name, y=y_name)) + \
@@ -269,7 +272,7 @@ def create_bubble2(dataframe:pd.DataFrame, count_name:str, x_name:str, y_name:st
              axis_text_x=element_text(angle=90,hjust=1,vjust=0)) 
              
     )
-    print(res)
+    print(res) #prints the bubble plot
 
 #     res2= ggplot(dataframe, aes(x = x_name, y = "number of studies",  color = y_name)) + \
 #         geom_line(alpha = 0.5)
@@ -286,4 +289,57 @@ def create_venn3(labels, names):
 
     #fig.savefig('venn4.png', bbox_inches='tight')
     plt.show()
+    
+def create_treemap_graph(dataframe:pd.DataFrame, count_name:str, outer_name:str, inner_name:str, color:str="lightgrey", font_size:int=25): 
+    fig = px.treemap(dataframe,
+                     path=[outer_name, inner_name],
+                     values=count_name)
+    fig.update_traces(root_color=color)
+    fig.update_layout(margin=dict(t=50, l=25, r=25, b=25), font=dict(size=font_size))
+    fig.show()
+    
+def create_sankey(dataframe:pd.DataFrame, source_column: str, target_column:str, counter_column:str, title:str):
+    
+    #Create a dictionary in which keys are the different values of source and target columns
+    #and the values are the index of the value
+    
+    source_values = dataframes.get_column_unique_values(dataframe, source_column)
+    target_values = dataframes.get_column_unique_values(dataframe, target_column)
+    all_values = source_values.union( target_values)
+    dict_indexes = {value:index for index, value in enumerate(all_values)}
+
+    source = []
+    target = []
+    value = []
+    for index, row in dataframe.iterrows():
+        source_label = row[source_column]
+        target_label = row[target_column]
+        counter = row[counter_column]
+        if counter > 1:
+            source.append(dict_indexes.get(source_label))
+            target.append(dict_indexes.get(target_label))
+            value.append(counter)
+
+    #List with all labels indexed as specified in dict_indexes
+    #as it is a dictionary, we can not assure the order
+
+    ordered_items = sorted(dict_indexes.items(), key=lambda t:t[1])
+    
+    labels =   list('<b>' + label + '</b>' for label, _ in ordered_items)
+    fig = go.Figure(data=[go.Sankey(
+        node=dict(
+            pad=15,
+            thickness=20,
+            line=dict(color="black", width=0.5),
+            label=labels, # list with all the possible labels
+            color="blue"
+        ),
+        link=dict(
+            source=source,  #index of the source labels
+            target=target,  #index of the target label
+            value=value     #value
+        ))])
+
+    fig.update_layout(title_text=title, font_size=10, font=dict(size=25, ))
+    fig.show()   
     

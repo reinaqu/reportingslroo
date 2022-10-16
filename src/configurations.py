@@ -33,7 +33,8 @@ config_publ ={'skip_rows': 7,
              'quality_sheet_name':'Quality',
              'quality_skip_rows':0,
              'contextual_iq': 'Contextual IQ',
-             'intrinsic_iq': 'Intrinsic IQ'
+             'intrinsic_iq': 'Intrinsic IQ',
+             'completness': 'Completness'
 }
     
 config_auth ={'author_ID':'Author ID',
